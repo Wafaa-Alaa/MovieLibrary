@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-     "json-server": "json-server --watch data/data.json --port 3000",
+    "json-server": "json-server --watch data/data.json --port 3000",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "next": "^15.3.2",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
