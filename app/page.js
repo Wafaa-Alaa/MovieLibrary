@@ -1,8 +1,10 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { FaGithub, FaSpinner } from 'react-icons/fa';
 
-const UserRegistrationForm = () => {
+const RegisterPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
@@ -17,8 +19,8 @@ const UserRegistrationForm = () => {
     email: false,
     password: false
   });
+  const [githubLoading, setGithubLoading] = useState(false);
 
- 
   useEffect(() => {
     const newErrors = { ...errors };
     let hasChanges = false;
@@ -50,7 +52,6 @@ const UserRegistrationForm = () => {
       [name]: value
     });
     
-   
     if (!touched[name]) {
       setTouched({
         ...touched,
@@ -103,48 +104,236 @@ const UserRegistrationForm = () => {
     }));
   };
 
-  
-
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  // Validate all fields first
-  validateField('username', formData.username);
-  validateField('email', formData.email);
-  validateField('password', formData.password);
-  
-  // Check if there are any errors
-  const hasErrors = 
-    !formData.username || formData.username.length < 3 ||
-    !formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ||
-    !formData.password || formData.password.length < 6;
-  
-  if (!hasErrors) {
-    setIsSubmitting(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      router.push('/movies');
-    } catch (error) {
-      console.error('Registration error:', error);
-    } finally {
-      setIsSubmitting(false);
+    e.preventDefault();
+    
+    validateField('username', formData.username);
+    validateField('email', formData.email);
+    validateField('password', formData.password);
+    
+    const hasErrors = 
+      !formData.username || formData.username.length < 3 ||
+      !formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ||
+      !formData.password || formData.password.length < 6;
+    
+    if (!hasErrors) {
+      setIsSubmitting(true);
+      try {
+        const result = await signIn('credentials', {
+          redirect: false,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          callbackUrl: '/movies'
+        });
+
+        if (result?.error) {
+          console.error('Registration error:', result.error);
+        } else {
+          router.push('/movies');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-  }
-};
+  };
+
+  const handleGitHubSignIn = async () => {
+    setGithubLoading(true);
+    try {
+      await signIn('github', { 
+        callbackUrl: '/movies',
+        redirect: true 
+      });
+    } catch (error) {
+      console.error('GitHub sign in error:', error);
+      setGithubLoading(false);
+    }
+  };
+
+  // Define styles as a constant outside the return
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f9fafb',
+      padding: '3rem 1rem',
+    },
+    card: {
+      maxWidth: '28rem',
+      width: '100%',
+      backgroundColor: 'white',
+      borderRadius: '0.5rem',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      padding: '2rem',
+    },
+    title: {
+      marginTop: '1.5rem',
+      textAlign: 'center',
+      fontSize: '1.875rem',
+      fontWeight: '800',
+      color: '#1f2937',
+    },
+    dividerContainer: {
+      position: 'relative',
+      margin: '1.5rem 0',
+    },
+    dividerLine: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      alignItems: 'center',
+    },
+    dividerText: {
+      position: 'relative',
+      padding: '0 0.5rem',
+      backgroundColor: 'white',
+      fontSize: '0.875rem',
+      color: '#6b7280',
+    },
+    form: {
+      marginTop: '2rem',
+    },
+    formGroup: {
+      marginBottom: '1.5rem',
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      color: '#374151',
+      marginBottom: '0.5rem',
+    },
+    input: {
+      display: 'block',
+      width: '100%',
+      padding: '0.5rem 0.75rem',
+      borderRadius: '0.375rem',
+      border: '1px solid #d1d5db',
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      fontSize: '0.875rem',
+      lineHeight: '1.25rem',
+      transition: 'all 0.2s',
+      outline: 'none',
+    },
+    inputError: {
+      borderColor: '#f87171',
+      boxShadow: '0 0 0 2px rgba(248, 113, 113, 0.2)',
+    },
+    inputValid: {
+      borderColor: '#34d399',
+      boxShadow: '0 0 0 2px rgba(52, 211, 153, 0.2)',
+    },
+    errorText: {
+      marginTop: '0.25rem',
+      fontSize: '0.75rem',
+      color: '#ef4444',
+    },
+    button: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      padding: '0.5rem 1rem',
+      borderRadius: '0.375rem',
+      border: 'none',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+    },
+    githubButton: {
+      backgroundColor: '#1f2937',
+      color: 'white',
+      marginBottom: '1rem',
+      '&:hover': {
+        backgroundColor: '#111827',
+      },
+    },
+    registerButton: {
+      backgroundColor: '#3b82f6',
+      color: 'white',
+      '&:hover': {
+        backgroundColor: '#2563eb',
+      },
+      '&:disabled': {
+        opacity: '0.5',
+        cursor: 'not-allowed',
+      },
+    },
+    icon: {
+      marginRight: '0.5rem',
+    },
+    spinner: {
+      animation: 'spin 1s linear infinite',
+    },
+    footerText: {
+      textAlign: 'center',
+      fontSize: '0.875rem',
+      color: '#6b7280',
+      marginTop: '1rem',
+    },
+    link: {
+      fontWeight: '500',
+      color: '#3b82f6',
+      cursor: 'pointer',
+      '&:hover': {
+        color: '#2563eb',
+      },
+    },
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.title}>Create Account</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <h2 style={styles.title}>Create your account</h2>
+
+        <button
+          onClick={handleGitHubSignIn}
+          disabled={githubLoading}
+          style={{ 
+            ...styles.button, 
+            ...styles.githubButton,
+            opacity: githubLoading ? 0.7 : 1
+          }}
+        >
+          {githubLoading ? (
+            <>
+              <FaSpinner style={{ ...styles.icon, animation: 'spin 1s linear infinite' }} />
+              Signing in with GitHub...
+            </>
+          ) : (
+            <>
+              <FaGithub style={styles.icon} />
+              Sign up with GitHub
+            </>
+          )}
+        </button>
+
+        <div style={styles.dividerContainer}>
+          <div style={styles.dividerLine}>
+            <div style={{ width: '100%', borderTop: '1px solid #d1d5db' }}></div>
+          </div>
+          <div style={styles.dividerText}>Or register with email</div>
+        </div>
+
+        <form style={styles.form} onSubmit={handleSubmit}>
           <div style={styles.formGroup}>
             <label htmlFor="username" style={styles.label}>
               Username
             </label>
             <input
-              type="text"
               id="username"
               name="username"
+              type="text"
+              required
               value={formData.username}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -155,17 +344,19 @@ const UserRegistrationForm = () => {
               }}
               placeholder="Enter your username"
             />
-            {errors.username && <span style={styles.error}>{errors.username}</span>}
+            {errors.username && <p style={styles.errorText}>{errors.username}</p>}
           </div>
 
           <div style={styles.formGroup}>
             <label htmlFor="email" style={styles.label}>
-              Email
+              Email address
             </label>
             <input
-              type="email"
               id="email"
               name="email"
+              type="email"
+              autoComplete="email"
+              required
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -176,7 +367,7 @@ const UserRegistrationForm = () => {
               }}
               placeholder="Enter your email"
             />
-            {errors.email && <span style={styles.error}>{errors.email}</span>}
+            {errors.email && <p style={styles.errorText}>{errors.email}</p>}
           </div>
 
           <div style={styles.formGroup}>
@@ -184,9 +375,11 @@ const UserRegistrationForm = () => {
               Password
             </label>
             <input
-              type="password"
               id="password"
               name="password"
+              type="password"
+              autoComplete="current-password"
+              required
               value={formData.password}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -197,124 +390,35 @@ const UserRegistrationForm = () => {
               }}
               placeholder="Enter your password"
             />
-            {errors.password && <span style={styles.error}>{errors.password}</span>}
+            {errors.password && <p style={styles.errorText}>{errors.password}</p>}
           </div>
 
           <button
             type="submit"
-            style={{
-              ...styles.button,
-              ...(isSubmitting ? styles.buttonDisabled : {})
-            }}
             disabled={isSubmitting}
+            style={{ ...styles.button, ...styles.registerButton }}
           >
             {isSubmitting ? (
               <>
-                <span style={styles.spinner}></span>
+                <FaSpinner style={{ ...styles.icon, animation: 'spin 1s linear infinite' }} />
                 Registering...
               </>
-            ) : (
-              'Register'
-            )}
+            ) : 'Register'}
           </button>
         </form>
+
+        <p style={styles.footerText}>
+          Already have an account?{' '}
+          <span 
+            onClick={() => router.push('/movies')}
+            style={styles.link}
+          >
+            Sign in
+          </span>
+        </p>
       </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: '10px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    padding: '2rem',
-    width: '100%',
-    maxWidth: '400px',
-  },
-  title: {
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: '1.5rem',
-    fontSize: '1.8rem',
-    fontWeight: '600',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.2rem',
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  label: {
-    color: '#555',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-  },
-  input: {
-    padding: '0.8rem',
-    borderRadius: '6px',
-    border: '1px solid #ddd',
-    fontSize: '1rem',
-    transition: 'all 0.3s',
-  },
-  inputError: {
-    borderColor: '#e74c3c',
-    boxShadow: '0 0 0 2px rgba(231, 76, 60, 0.2)',
-  },
-  inputValid: {
-    borderColor: '#2ecc71',
-    boxShadow: '0 0 0 2px rgba(46, 204, 113, 0.2)',
-  },
-  error: {
-    color: '#e74c3c',
-    fontSize: '0.8rem',
-    marginTop: '0.2rem',
-    height: '0.8rem',
-  },
-  button: {
-    backgroundColor: '#4a90e2',
-    color: 'white',
-    padding: '0.8rem',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '1rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s',
-    marginTop: '0.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-  },
-  buttonDisabled: {
-    backgroundColor: '#cccccc',
-    cursor: 'not-allowed',
-  },
-  spinner: {
-    display: 'inline-block',
-    width: '1rem',
-    height: '1rem',
-    border: '2px solid rgba(255,255,255,0.3)',
-    borderRadius: '50%',
-    borderTopColor: '#fff',
-    animation: 'spin 1s ease-in-out infinite',
-  },
-  '@keyframes spin': {
-    to: { transform: 'rotate(360deg)' },
-  },
-};
-
-export default UserRegistrationForm;
+export default RegisterPage;
