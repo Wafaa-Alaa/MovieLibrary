@@ -150,7 +150,7 @@ const MovDetails = () => {
     );
 };
 
-// Base styles (without media queries)
+
 const styles = {
     pageContainer: {
         position: 'relative',

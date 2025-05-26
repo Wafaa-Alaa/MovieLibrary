@@ -153,7 +153,7 @@ const RegisterPage = () => {
     }
   };
 
-  // Define styles as a constant outside the return
+ 
   const styles = {
     container: {
       minHeight: '100vh',

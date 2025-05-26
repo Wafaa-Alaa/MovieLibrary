@@ -26,7 +26,7 @@ const MovieForm = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -489,7 +489,7 @@ const MovieForm = () => {
                 />
                 {formData.poster_path && (
                   <div style={styles.previewContainer}>
-                    <img 
+                    <img
                       src={getTmdbImageUrl(formData.poster_path)}
                       alt="Poster preview"
                       style={styles.imagePreview}
@@ -516,7 +516,7 @@ const MovieForm = () => {
                 />
                 {formData.backdrop_path && (
                   <div style={styles.previewContainer}>
-                    <img 
+                    <img
                       src={getTmdbImageUrl(formData.backdrop_path, 'original')}
                       alt="Backdrop preview"
                       style={styles.imagePreview}

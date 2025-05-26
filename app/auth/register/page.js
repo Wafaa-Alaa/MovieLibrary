@@ -51,7 +51,7 @@ const RegisterPage = () => {
       ...formData,
       [name]: value
     });
-    
+
     if (!touched[name]) {
       setTouched({
         ...touched,
@@ -71,7 +71,7 @@ const RegisterPage = () => {
 
   const validateField = (fieldName, value) => {
     let error = '';
-    
+
     switch (fieldName) {
       case 'username':
         if (!value.trim()) {
@@ -106,16 +106,16 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     validateField('username', formData.username);
     validateField('email', formData.email);
     validateField('password', formData.password);
-    
-    const hasErrors = 
+
+    const hasErrors =
       !formData.username || formData.username.length < 3 ||
       !formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ||
       !formData.password || formData.password.length < 6;
-    
+
     if (!hasErrors) {
       setIsSubmitting(true);
       try {
@@ -143,9 +143,9 @@ const RegisterPage = () => {
   const handleGitHubSignIn = async () => {
     setGithubLoading(true);
     try {
-      await signIn('github', { 
+      await signIn('github', {
         callbackUrl: '/movies',
-        redirect: true 
+        redirect: true
       });
     } catch (error) {
       console.error('GitHub sign in error:', error);
@@ -153,7 +153,7 @@ const RegisterPage = () => {
     }
   };
 
-  // Define styles as a constant outside the return
+
   const styles = {
     container: {
       minHeight: '100vh',
@@ -298,8 +298,8 @@ const RegisterPage = () => {
         <button
           onClick={handleGitHubSignIn}
           disabled={githubLoading}
-          style={{ 
-            ...styles.button, 
+          style={{
+            ...styles.button,
             ...styles.githubButton,
             opacity: githubLoading ? 0.7 : 1
           }}
@@ -409,7 +409,7 @@ const RegisterPage = () => {
 
         <p style={styles.footerText}>
           Already have an account?{' '}
-          <span 
+          <span
             onClick={() => router.push('/movies')}
             style={styles.link}
           >

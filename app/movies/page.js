@@ -25,11 +25,11 @@ const MoviesLibrary = () => {
             const response = await fetch(`/api/movies/${id}`, {
                 method: 'DELETE'
             });
-            
+
             if (!response.ok) {
                 throw new Error('Delete failed');
             }
-            
+
             setMovies(prev => prev.filter(movie => movie.id !== id));
         } catch (error) {
             console.error('Delete failed:', error);
@@ -47,15 +47,15 @@ const MoviesLibrary = () => {
 
     const getImageUrl = (path) => {
         if (!path) return null;
-      
+
         if (path.startsWith('/http')) {
             return path.substring(1);
         }
-     
+
         if (path.startsWith('http')) {
             return path;
         }
-      
+
         return `https://image.tmdb.org/t/p/w500${path}`;
     };
 
@@ -66,7 +66,7 @@ const MoviesLibrary = () => {
         <div style={styles.container}>
             <div style={styles.headerContainer}>
                 <h1 style={styles.header}>All Movies</h1>
-                <button 
+                <button
                     style={styles.addButton}
                     onClick={handleAddMovie}
                 >
@@ -81,10 +81,10 @@ const MoviesLibrary = () => {
                     return (
                         <div key={id} style={styles.movieCard}>
                             {img ? (
-                                <img 
-                                    style={styles.movieImage} 
-                                    src={img} 
-                                    alt={title} 
+                                <img
+                                    style={styles.movieImage}
+                                    src={img}
+                                    alt={title}
                                     onClick={() => router.push(`/movies/MovieDetails/${id}`)}
                                     onError={(e) => {
                                         e.target.onerror = null;
@@ -101,13 +101,13 @@ const MoviesLibrary = () => {
                                 <h2 style={styles.movieTitle}>{title}</h2>
                             </div>
                             <div style={styles.buttonContainer}>
-                                <button 
+                                <button
                                     style={styles.readButton}
                                     onClick={() => router.push(`/movies/MovieDetails/${id}`)}
                                 >
                                     Read More
                                 </button>
-                                <button 
+                                <button
                                     style={styles.deleteButton}
                                     onClick={() => handleDelete(id)}
                                 >

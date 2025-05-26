@@ -18,16 +18,16 @@ export async function GET() {
 export async function POST(request) {
   try {
     const data = await request.json();
-    
-   
+
+
     const newId = Math.max(...movies.map(movie => movie.id)) + 1;
-    
-    
+
+
     const newMovie = {
       id: newId,
       adult: data.adult || false,
       backdrop_path: data.backdrop_path || '',
-      genre_ids: data.genres.map((_, index) => index + 1), 
+      genre_ids: data.genres.map((_, index) => index + 1),
       original_language: 'en',
       original_title: data.original_title || data.title,
       overview: data.overview || '',
@@ -40,10 +40,10 @@ export async function POST(request) {
       vote_count: data.vote_count ? Number(data.vote_count) : 0
     };
 
-  
+
     const updatedMovies = [...movies, newMovie];
 
-   
+
     const filePath = path.join(process.cwd(), 'data', 'data.json');
     fs.writeFileSync(filePath, JSON.stringify(updatedMovies, null, 2));
 
